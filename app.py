@@ -5,22 +5,18 @@ import os
 
 app = Flask(__name__)
 
-# Define stopwords manually (to avoid NLTK download issue)
+# Stopwords (manual to avoid NLTK issues on Vercel)
 stop_words = {
 "a","about","above","after","again","against","all","am","an","and","any","are","as","at",
 "be","because","been","before","being","below","between","both","but","by",
-"could",
-"did","do","does","doing","down","during",
-"each",
-"few","for","from","further",
+"could","did","do","does","doing","down","during",
+"each","few","for","from","further",
 "had","has","have","having","he","her","here","hers","herself","him","himself","his","how",
 "i","if","in","into","is","it","its","itself",
-"just",
-"me","more","most","my","myself",
+"just","me","more","most","my","myself",
 "no","nor","not","now",
 "of","off","on","once","only","or","other","our","ours","ourselves","out","over","own",
-"s",
-"same","she","should","so","some","such",
+"s","same","she","should","so","some","such",
 "t","than","that","the","their","theirs","them","themselves","then","there","these","they","this","those","through","to","too",
 "under","until","up",
 "very",
@@ -36,12 +32,12 @@ vectorizer = pickle.load(open(os.path.join(BASE_DIR, "vectorizer.pkl"), "rb"))
 
 
 def clean_text(text):
+
     text = text.lower()
 
     # remove punctuation
     text = ''.join([c for c in text if c not in string.punctuation])
 
-    # split words
     words = text.split()
 
     # remove stopwords
@@ -59,6 +55,7 @@ def home():
 def predict():
 
     data = request.get_json()
+
     review = data["text"]
 
     cleaned = clean_text(review)
@@ -69,11 +66,13 @@ def predict():
 
     prob = model.predict_proba(vector).max()
 
+    confidence = round(prob * 100, 2)
+
     result = "🎉 Blockbuster" if prediction == 1 else "💥 Flop"
 
     return jsonify({
         "prediction": result,
-        "confidence": float(prob)
+        "confidence": confidence
     })
 
 
