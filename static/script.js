@@ -1,18 +1,47 @@
-async function predict(){
+function predict() {
 
-let review = document.getElementById("review").value;
+    let review = document.getElementById("review").value;
 
-let response = await fetch("/predict",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({review:review})
-})
+    document.getElementById("loader").style.display = "block";
 
-let data = await response.json()
+    fetch("/predict", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text: review })
+    })
 
-document.getElementById("result").innerHTML =
-data.prediction + "<br>Confidence: " + data.confidence + "%"
+    .then(res => res.json())
+
+    .then(data => {
+
+        document.getElementById("loader").style.display = "none";
+
+        document.getElementById("result").innerHTML =
+            "Prediction: " + data.prediction;
+
+        let confidence = Math.round(data.confidence * 100);
+
+        let bar = document.getElementById("confidence-bar");
+
+        bar.style.width = confidence + "%";
+        bar.innerHTML = confidence + "%";
+
+    });
+
+}
+
+
+function clearText() {
+
+    document.getElementById("review").value = "";
+
+    document.getElementById("result").innerHTML = "";
+
+    let bar = document.getElementById("confidence-bar");
+
+    bar.style.width = "0%";
+    bar.innerHTML = "";
 
 }

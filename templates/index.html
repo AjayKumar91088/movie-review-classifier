@@ -1,24 +1,37 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-<title>Movie Review Classifier</title>
-<link rel="stylesheet" href="/static/style.css">
+    <title>AI Movie Review Analyzer</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
 
-<h1>🎬 Movie Review Classifier</h1>
+    <div class="container">
 
-<textarea id="review" placeholder="Type your movie review..."></textarea>
+        <div class="title-container">
+            <h1 class="main-title">AI Movie Review</h1>
+            <h2 class="sub-title">Analyzer</h2>
+        </div>
 
-<br><br>
+        <textarea id="review" placeholder="Enter your movie review here..."></textarea>
 
-<button onclick="predict()">Analyze</button>
+        <br>
 
-<div id="result"></div>
+        <button onclick="predict()" class="analyze-btn">Analyze Sentiment</button>
+        <button onclick="clearText()" class="clear-btn">Clear</button>
 
-<script src="/static/script.js"></script>
+        <div id="loader" class="loader"></div>
+
+        <h2 id="result"></h2>
+
+        <div class="bar-container">
+            <div id="confidence-bar"></div>
+        </div>
+
+    </div>
+
+    <script src="/static/script.js"></script>
 
 </body>
 </html>

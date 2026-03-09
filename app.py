@@ -5,13 +5,14 @@ from nltk.corpus import stopwords
 
 app = Flask(__name__)
 
-model = pickle.load(open("model.pkl","rb"))
-vectorizer = pickle.load(open("vectorizer.pkl","rb"))
+# Load model and vectorizer
+model = pickle.load(open("model.pkl", "rb"))
+vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
-stop_words = stopwords.words('english')
+stop_words = stopwords.words("english")
+
 
 def clean_text(text):
-
     text = text.lower()
     text = ''.join([c for c in text if c not in string.punctuation])
     words = text.split()
@@ -19,32 +20,39 @@ def clean_text(text):
 
     return " ".join(words)
 
+
 @app.route("/")
 def home():
     return render_template("index.html")
 
+
 @app.route("/predict", methods=["POST"])
 def predict():
 
-    review = request.json["review"]
+    # get text from frontend
+    data = request.get_json()
+    review = data["text"]
 
+    # clean text
     cleaned = clean_text(review)
+
+    # vectorize
     vector = vectorizer.transform([cleaned])
 
-    pred = model.predict(vector)[0]
-    prob = model.predict_proba(vector)[0]
+    # prediction
+    prediction = model.predict(vector)[0]
 
-    confidence = round(max(prob)*100,2)
+    # probability
+    prob = model.predict_proba(vector).max()
 
-    if pred == 1:
-        result = "🎉 Blockbuster"
-    else:
-        result = "💥 Flop"
+    # convert prediction to label
+    result = "🎉 Blockbuster" if prediction == 1 else "💥 Flop"
 
     return jsonify({
         "prediction": result,
-        "confidence": confidence
+        "confidence": float(prob)
     })
+
 
 if __name__ == "__main__":
     app.run(debug=True)
