@@ -3,63 +3,25 @@
 
 <head>
 <title>Movie Review Classifier</title>
-
-<style>
-
-body{
-font-family: Arial;
-text-align:center;
-margin-top:100px;
-background:#f2f2f2;
-}
-
-textarea{
-width:400px;
-height:120px;
-font-size:16px;
-padding:10px;
-}
-
-button{
-padding:10px 20px;
-font-size:18px;
-margin-top:10px;
-cursor:pointer;
-}
-
-#result{
-font-size:24px;
-font-weight:bold;
-margin-top:20px;
-}
-
-</style>
-
 </head>
 
 <body>
 
-<h1>🎬 Movie Review Classifier</h1>
+<h2>Movie Review Classifier</h2>
 
-<p>Enter a movie review:</p>
+<textarea id="review" rows="6" cols="50"></textarea>
 
-<textarea id="review"></textarea>
-
-<br>
+<br><br>
 
 <button onclick="predict()">Predict</button>
 
-<div id="result"></div>
+<h3 id="result"></h3>
 
 <script>
 
 function predict(){
 
 let review = document.getElementById("review").value;
-
-let resultDiv = document.getElementById("result");
-
-resultDiv.innerHTML = "Analyzing review... ⏳";
 
 fetch("/predict",{
 
@@ -77,16 +39,8 @@ body:JSON.stringify({text:review})
 
 .then(data=>{
 
-if(data.prediction.includes("Blockbuster")){
-resultDiv.style.color="green";
-}
-else{
-resultDiv.style.color="red";
-}
-
-resultDiv.innerHTML =
-data.prediction +
-"<br>Confidence: "+data.confidence+"%";
+document.getElementById("result").innerHTML =
+"Prediction: "+data.prediction;
 
 });
 
