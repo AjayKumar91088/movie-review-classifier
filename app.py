@@ -2,27 +2,37 @@ from flask import Flask, request, jsonify, render_template
 import pickle
 import string
 import os
-import nltk
-from nltk.corpus import stopwords
 
 app = Flask(__name__)
 
-# Ensure stopwords are available
-try:
-    stop_words = stopwords.words("english")
-except LookupError:
-    nltk.download("stopwords")
-    stop_words = stopwords.words("english")
+# Define stopwords manually (to avoid NLTK download issue)
+stop_words = {
+"a","about","above","after","again","against","all","am","an","and","any","are","as","at",
+"be","because","been","before","being","below","between","both","but","by",
+"could",
+"did","do","does","doing","down","during",
+"each",
+"few","for","from","further",
+"had","has","have","having","he","her","here","hers","herself","him","himself","his","how",
+"i","if","in","into","is","it","its","itself",
+"just",
+"me","more","most","my","myself",
+"no","nor","not","now",
+"of","off","on","once","only","or","other","our","ours","ourselves","out","over","own",
+"s",
+"same","she","should","so","some","such",
+"t","than","that","the","their","theirs","them","themselves","then","there","these","they","this","those","through","to","too",
+"under","until","up",
+"very",
+"was","we","were","what","when","where","which","while","who","whom","why","will","with",
+"you","your","yours","yourself","yourselves"
+}
 
-# Get current directory
+# Load model safely
 BASE_DIR = os.path.dirname(__file__)
 
-# Load model and vectorizer safely
-model_path = os.path.join(BASE_DIR, "model.pkl")
-vectorizer_path = os.path.join(BASE_DIR, "vectorizer.pkl")
-
-model = pickle.load(open(model_path, "rb"))
-vectorizer = pickle.load(open(vectorizer_path, "rb"))
+model = pickle.load(open(os.path.join(BASE_DIR, "model.pkl"), "rb"))
+vectorizer = pickle.load(open(os.path.join(BASE_DIR, "vectorizer.pkl"), "rb"))
 
 
 def clean_text(text):
@@ -31,7 +41,7 @@ def clean_text(text):
     # remove punctuation
     text = ''.join([c for c in text if c not in string.punctuation])
 
-    # tokenize
+    # split words
     words = text.split()
 
     # remove stopwords
@@ -48,23 +58,17 @@ def home():
 @app.route("/predict", methods=["POST"])
 def predict():
 
-    # get text from frontend
     data = request.get_json()
     review = data["text"]
 
-    # clean text
     cleaned = clean_text(review)
 
-    # vectorize
     vector = vectorizer.transform([cleaned])
 
-    # prediction
     prediction = model.predict(vector)[0]
 
-    # probability
     prob = model.predict_proba(vector).max()
 
-    # label
     result = "🎉 Blockbuster" if prediction == 1 else "💥 Flop"
 
     return jsonify({
