@@ -1,37 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AI Movie Review Analyzer</title>
-    <link rel="stylesheet" href="/static/style.css">
+<title>Movie Review Classifier</title>
 </head>
 
 <body>
 
-    <div class="container">
+<h2>Movie Review Classifier</h2>
 
-        <div class="title-container">
-            <h1 class="main-title">AI Movie Review</h1>
-            <h2 class="sub-title">Analyzer</h2>
-        </div>
+<textarea id="review" rows="6" cols="50"></textarea>
 
-        <textarea id="review" placeholder="Enter your movie review here..."></textarea>
+<br><br>
 
-        <br>
+<button onclick="predict()">Predict</button>
 
-        <button onclick="predict()" class="analyze-btn">Analyze Sentiment</button>
-        <button onclick="clearText()" class="clear-btn">Clear</button>
+<h3 id="result"></h3>
 
-        <div id="loader" class="loader"></div>
+<script>
 
-        <h2 id="result"></h2>
+function predict(){
 
-        <div class="bar-container">
-            <div id="confidence-bar"></div>
-        </div>
+let review = document.getElementById("review").value;
 
-    </div>
+fetch("/predict",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({text:review})
+})
+.then(response=>response.json())
+.then(data=>{
+document.getElementById("result").innerHTML =
+"Prediction: " + data.prediction;
+});
 
-    <script src="/static/script.js"></script>
+}
+
+</script>
 
 </body>
+
 </html>

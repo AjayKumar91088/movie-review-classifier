@@ -5,46 +5,24 @@ import os
 
 app = Flask(__name__)
 
-# Define stopwords manually (to avoid NLTK download issue)
+# simple stopwords
 stop_words = {
-"a","about","above","after","again","against","all","am","an","and","any","are","as","at",
-"be","because","been","before","being","below","between","both","but","by",
-"could",
-"did","do","does","doing","down","during",
-"each",
-"few","for","from","further",
-"had","has","have","having","he","her","here","hers","herself","him","himself","his","how",
-"i","if","in","into","is","it","its","itself",
-"just",
-"me","more","most","my","myself",
-"no","nor","not","now",
-"of","off","on","once","only","or","other","our","ours","ourselves","out","over","own",
-"s",
-"same","she","should","so","some","such",
-"t","than","that","the","their","theirs","them","themselves","then","there","these","they","this","those","through","to","too",
-"under","until","up",
-"very",
-"was","we","were","what","when","where","which","while","who","whom","why","will","with",
-"you","your","yours","yourself","yourselves"
+"a","an","the","is","are","was","were","in","on","at","for","to","of","and","or","but","if","with","as","by","about","from"
 }
 
-# Load model safely
 BASE_DIR = os.path.dirname(__file__)
 
 model = pickle.load(open(os.path.join(BASE_DIR, "model.pkl"), "rb"))
 vectorizer = pickle.load(open(os.path.join(BASE_DIR, "vectorizer.pkl"), "rb"))
 
-
 def clean_text(text):
+
     text = text.lower()
 
-    # remove punctuation
     text = ''.join([c for c in text if c not in string.punctuation])
 
-    # split words
     words = text.split()
 
-    # remove stopwords
     words = [w for w in words if w not in stop_words]
 
     return " ".join(words)
@@ -59,6 +37,7 @@ def home():
 def predict():
 
     data = request.get_json()
+
     review = data["text"]
 
     cleaned = clean_text(review)
@@ -67,14 +46,9 @@ def predict():
 
     prediction = model.predict(vector)[0]
 
-    prob = model.predict_proba(vector).max()
+    result = "Blockbuster" if prediction == 1 else "Flop"
 
-    result = "🎉 Blockbuster" if prediction == 1 else "💥 Flop"
-
-    return jsonify({
-        "prediction": result,
-        "confidence": float(prob)
-    })
+    return jsonify({"prediction": result})
 
 
 if __name__ == "__main__":
