@@ -1,44 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Movie Review Classifier</title>
+    <title>AI Movie Review Analyzer</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
 
-<h2>Movie Review Classifier</h2>
+    <div class="container">
 
-<textarea id="review" rows="6" cols="50"></textarea>
+        <div class="title-container">
+            <h1 class="main-title">AI Movie Review</h1>
+            <h2 class="sub-title">Analyzer</h2>
+        </div>
 
-<br><br>
+        <textarea id="review" placeholder="Enter your movie review here..."></textarea>
 
-<button onclick="predict()">Predict</button>
+        <br>
 
-<h3 id="result"></h3>
+        <button onclick="predict()" class="analyze-btn">Analyze Sentiment</button>
+        <button onclick="clearText()" class="clear-btn">Clear</button>
 
-<script>
+        <div id="loader" class="loader"></div>
 
-function predict(){
+        <h2 id="result"></h2>
 
-let review = document.getElementById("review").value;
+        <div class="bar-container">
+            <div id="confidence-bar"></div>
+        </div>
 
-fetch("/predict",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({text:review})
-})
-.then(response=>response.json())
-.then(data=>{
-document.getElementById("result").innerHTML =
-"Prediction: " + data.prediction;
-});
+    </div>
 
-}
-
-</script>
+    <script src="/static/script.js"></script>
 
 </body>
-
 </html>
