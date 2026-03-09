@@ -1,55 +1,35 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, render_template, request, jsonify
 import pickle
-import string
-import os
 
 app = Flask(__name__)
 
-# simple stopwords
-stop_words = {
-"a","an","the","is","are","was","were","in","on","at","for","to","of","and","or","but","if","with","as","by","about","from"
-}
-
-BASE_DIR = os.path.dirname(__file__)
-
-model = pickle.load(open(os.path.join(BASE_DIR, "model.pkl"), "rb"))
-vectorizer = pickle.load(open(os.path.join(BASE_DIR, "vectorizer.pkl"), "rb"))
-
-def clean_text(text):
-
-    text = text.lower()
-
-    text = ''.join([c for c in text if c not in string.punctuation])
-
-    words = text.split()
-
-    words = [w for w in words if w not in stop_words]
-
-    return " ".join(words)
-
+model = pickle.load(open("model.pkl", "rb"))
+vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
 @app.route("/")
 def home():
     return render_template("index.html")
 
-
 @app.route("/predict", methods=["POST"])
 def predict():
 
     data = request.get_json()
+    text = data["text"]
 
-    review = data["text"]
+    vec = vectorizer.transform([text])
 
-    cleaned = clean_text(review)
+    prediction = model.predict(vec)[0]
+    proba = model.predict_proba(vec).max()
 
-    vector = vectorizer.transform([cleaned])
+    if prediction == 1:
+        result = "Positive"
+    else:
+        result = "Negative"
 
-    prediction = model.predict(vector)[0]
-
-    result = "Blockbuster" if prediction == 1 else "Flop"
-
-    return jsonify({"prediction": result})
-
+    return jsonify({
+        "prediction": result,
+        "confidence": float(proba)
+    })
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)

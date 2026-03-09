@@ -18,8 +18,9 @@ function predict() {
 
         document.getElementById("loader").style.display = "none";
 
-        document.getElementById("result").innerHTML =
-            "Prediction: " + data.prediction;
+        let resultBox = document.getElementById("result");
+
+        resultBox.innerHTML = "Prediction: " + data.prediction;
 
         let confidence = Math.round(data.confidence * 100);
 
@@ -31,7 +32,6 @@ function predict() {
     });
 
 }
-
 
 function clearText() {
 
